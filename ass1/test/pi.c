@@ -1,5 +1,7 @@
 #include "mpi.h"
 #include <stdio.h>
+#include <math.h>
+
 
 //2**15
 #define SHORT_1_VALUE 32768
@@ -52,10 +54,26 @@ unsigned long AC_Table[32][2] = {  //see http://stream.massey.ac.nz/mod/resource
  * test if the coordinate represented by n falls within the circle.
  * return 1 if in the circle, 0 if not
  */
+/*
 int hit_circle (n)unsigned long n;
 {
     //calculate (x, y) for n
     double x, y;
+    unsigned long ix, iy;
+    ix = n % SHORT_VALUE;
+    iy = n / SHORT_VALUE;
+    x = ix*1.0 / SHORT_1_VALUE - 1;
+    y = iy*1.0 / SHORT_1_VALUE - 1;
+    return  (x*x + y*y <= 1) ? 1:0;
+}
+*/
+
+int hit_circle (n)unsigned long n;
+{
+    //calculate (x, y) for n
+
+    double x, y;
+//    x = sqrt(n);
     unsigned long ix, iy;
     ix = n % SHORT_VALUE;
     iy = n / SHORT_VALUE;
@@ -158,7 +176,8 @@ int main(argc,argv)int argc;char *argv[];
         return 0;
     }  
 
-    task_n = N / numproc; //ignore the remainder if there is as N is to be very big
+//    task_n = N / numproc; //ignore the remainder if there is as N is to be very big
+    task_n = N / (numproc-1); //ignore the remainder if there is as N is to be very big
 
     total = 0; //the total number that falls in the circle
     if (myid == 0) // if master
@@ -177,9 +196,9 @@ int main(argc,argv)int argc;char *argv[];
          }	
 
          // Master does its own task
-         work_time_start = MPI_Wtime();
+       /*  work_time_start = MPI_Wtime();
          total = hit_number(RANDOM_SEED, task_n, A, C);
-         work_time = MPI_Wtime() - work_time_start;
+         work_time = MPI_Wtime() - work_time_start;*/
 
          //check all slaves
          for (i=1;i<numproc;i++)
