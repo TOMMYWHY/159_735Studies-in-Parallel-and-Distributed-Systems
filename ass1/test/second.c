@@ -51,11 +51,17 @@ int main(argc,argv)int argc;char *argv[];
       sum0=sum0+i;
     }
     result=sum0;
-    for (i=1;i<numproc;i++) {//receive from all nodes
+    /*for (i=1;i<numproc;i++) {//receive from all nodes
       MPI_Recv(&sum1, 1, MPI_LONG, i,0, MPI_COMM_WORLD, &Stat);
       result=result+sum1;//adds the various sums
       fprintf(stdout, "node=%ld: %ld %ld\n", i, result, sum1);
-    }
+    }*/
+      for  (i=1; i<N; i++)
+      {
+          MPI_Recv(&sum1, 1, MPI_LONG, i%(salves_p)+1,0, MPI_COMM_WORLD, &Stat);
+          result=result+sum1;//adds the various sums
+          fprintf(stdout, "node=%ld: %ld %ld\n", i, result, sum1);
+      }
     fprintf(stdout,"The sum from 1 to %ld is %ld \n",N,result);
   } 
 
