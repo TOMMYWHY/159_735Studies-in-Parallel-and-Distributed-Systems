@@ -2,29 +2,30 @@
 #include <stdio.h>
 #include <math.h>
 
-//2**15
-#define SHORT_1_VALUE 32768
-// 2**16
-#define SHORT_VALUE 65536
+#define MATRIX 65536
 
 
-//todo
-int hit_circle (n)unsigned long n;
+int is_in_circle (n)unsigned long n;
 {
-    //calculate (x, y) for n
+    //using n to calculate (x, y)  
     double x, y;
-    unsigned long ix, iy;
-    ix = n % SHORT_VALUE;
-    iy = n / SHORT_VALUE;
-    x = ix*1.0 / SHORT_1_VALUE - 1;
-    y = iy*1.0 / SHORT_1_VALUE - 1;
-    return  (x*x + y*y <= 1) ? 1:0;
+    y = ceil(n / MATRIX ); // 0-Matrix
+    x = n - ( y * MATRIX );
+    x = x /MATRIX -0.5; // 0-1 => -0.5 - 0.5  => R = 0.5
+    y = y /MATRIX -0.5;
+    // R**R = 0.25
+    if(x*x + y*y <= 0.25){
+        return 1;
+    }else
+    {
+        return 0;
+    }
 }
 
 int main(argc,argv)int argc;char *argv[];
 {
     int numproc, myid, namelen;
-    unsigned long total, hit, n0, n1, i;
+    unsigned long total, hit,in_circle, n0, n1, i;
     unsigned long N, A, C,two_32, per_processor_tasks;
     double  total_time_start, total_time;
     char processor_name[MPI_MAX_PROCESSOR_NAME];
@@ -58,14 +59,18 @@ int main(argc,argv)int argc;char *argv[];
     total = 0;
     if (myid == 0) // if master
     {
+        fprintf(stdout, "testing: %d \n", (MATRIX/2));
         fprintf(stdout, "Total Processors: %d \n", numproc);
+
         fprintf(stdout, "Master Processor name: %s\n", processor_name);
         total_time_start = MPI_Wtime();
-        n0 = 0;
+        n0 = 1;
         // Master sends N to all the slave processes
         for  (i=1; i<numproc; i++)
         {
             n1 = (A*n0+C) % two_32;
+            // fprintf(stdout, "***** %d\n",n0);
+            fprintf(stdout, "send %ld to slave %d\n",n1,i);
             MPI_Send(&n1, 1, MPI_LONG, i, 0, MPI_COMM_WORLD);
             n0 = n1;
         }
@@ -73,8 +78,8 @@ int main(argc,argv)int argc;char *argv[];
         //receive all slaves
         for (i=1;i<numproc;i++)
         {
-            MPI_Recv(&hit, 1, MPI_LONG, i, 0, MPI_COMM_WORLD, &Stat);
-            total += hit;
+            MPI_Recv(&in_circle, 1, MPI_LONG, i, 0, MPI_COMM_WORLD, &Stat);
+            total += in_circle;
         }
         total_time = MPI_Wtime() - total_time_start;
         fprintf(stdout, "------------\n");
@@ -92,16 +97,16 @@ int main(argc,argv)int argc;char *argv[];
         /*slaves*/
         total_time_start = MPI_Wtime();
         MPI_Recv(&n0, 1, MPI_LONG, 0, 0, MPI_COMM_WORLD, &Stat);
-        hit = hit_circle(n0);
+        in_circle = is_in_circle(n0);
         for(i=1; i<per_processor_tasks; i++){
             n1 = (A*n1+C) % two_32;
-            hit += hit_circle(n1);
+            in_circle += is_in_circle(n1);
             n0 = n1;
         }
-        MPI_Send(&hit, 1, MPI_LONG, 0, 0, MPI_COMM_WORLD);
+        MPI_Send(&in_circle, 1, MPI_LONG, 0, 0, MPI_COMM_WORLD);
         total_time = MPI_Wtime() - total_time_start;
         fprintf(stdout, "------------\n");
-        fprintf(stdout, "Slave processor %ld : hit/total is %ld/%ld\n", myid, hit, per_processor_tasks);
+        fprintf(stdout, "Slave processor %ld : in_circle amount:%ld ; total is %ld\n", myid, in_circle, per_processor_tasks);
         fprintf(stdout, "Slave processor %ld spend time: %f s\n", myid, total_time);
 //        fprintf(stdout, "------------\n");
     }
