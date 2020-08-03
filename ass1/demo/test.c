@@ -3,6 +3,9 @@
 #include <math.h>
 
 #define MATRIX 65536
+#define A  1664525
+#define C  1013904223
+#define TWO_32  4294967296
 
 
 int is_in_circle (n)unsigned long n;
@@ -25,8 +28,8 @@ int is_in_circle (n)unsigned long n;
 int main(argc,argv)int argc;char *argv[];
 {
     int numproc, myid, namelen;
-    unsigned long total, hit,in_circle, n0, n1, i;
-    unsigned long N, A, C,two_32, per_processor_tasks;
+    unsigned long total, hit,in_circles, n0, n1, i;
+    unsigned long N, per_processor_tasks;
     double  total_time_start, total_time;
     char processor_name[MPI_MAX_PROCESSOR_NAME];
     MPI_Status Stat;
@@ -34,31 +37,20 @@ int main(argc,argv)int argc;char *argv[];
     MPI_Init(&argc,&argv);//INITIALIZE
     MPI_Comm_size(MPI_COMM_WORLD, &numproc);
 
-    // todo  leap-frog need more numproc???
-    if ( numproc <=1  ) {
-        fprintf(stdout, " Need more Processors ~! \n" );
-        MPI_Finalize();
-        return 0;
-    }
-    if ( numproc > 32 ) {
-        fprintf(stdout, " Need Processors %d is too much~! \n", numproc);
-        MPI_Finalize();
-        return 0;
-    }
-
     MPI_Comm_rank(MPI_COMM_WORLD, &myid);
     MPI_Get_processor_name(processor_name, &namelen);
 
-      A = 1664525;
-      C = 1013904223;
-      two_32 = 4294967296;
+    // A = 1664525;
+    // C = 1013904223;
+    // two_32 = 4294967296;
     //    N = atoi(argv[1]);
-      N =10000000;
+    N =10000000;
 
     per_processor_tasks = N / (numproc-1);
     total = 0;
-    if (myid == 0) // if master
+    if (myid == 0) //  
     {
+        /*master*/
         fprintf(stdout, "testing: %d \n", (MATRIX/2));
         fprintf(stdout, "Total Processors: %d \n", numproc);
 
@@ -68,7 +60,7 @@ int main(argc,argv)int argc;char *argv[];
         // Master sends N to all the slave processes
         for  (i=1; i<numproc; i++)
         {
-            n1 = (A*n0+C) % two_32;
+            n1 = (A*n0+C) % TWO_32;
             // fprintf(stdout, "***** %d\n",n0);
             fprintf(stdout, "send %ld to slave %d\n",n1,i);
             MPI_Send(&n1, 1, MPI_LONG, i, 0, MPI_COMM_WORLD);
@@ -78,8 +70,8 @@ int main(argc,argv)int argc;char *argv[];
         //receive all slaves
         for (i=1;i<numproc;i++)
         {
-            MPI_Recv(&in_circle, 1, MPI_LONG, i, 0, MPI_COMM_WORLD, &Stat);
-            total += in_circle;
+            MPI_Recv(&in_circles, 1, MPI_LONG, i, 0, MPI_COMM_WORLD, &Stat);
+            total += in_circles;
         }
         total_time = MPI_Wtime() - total_time_start;
         fprintf(stdout, "------------\n");
@@ -97,16 +89,16 @@ int main(argc,argv)int argc;char *argv[];
         /*slaves*/
         total_time_start = MPI_Wtime();
         MPI_Recv(&n0, 1, MPI_LONG, 0, 0, MPI_COMM_WORLD, &Stat);
-        in_circle = is_in_circle(n0);
+        in_circles = is_in_circle(n0);
         for(i=1; i<per_processor_tasks; i++){
-            n1 = (A*n1+C) % two_32;
-            in_circle += is_in_circle(n1);
+            n1 = (A*n1+C) % TWO_32;
+            in_circles += is_in_circle(n1);
             n0 = n1;
         }
-        MPI_Send(&in_circle, 1, MPI_LONG, 0, 0, MPI_COMM_WORLD);
+        MPI_Send(&in_circles, 1, MPI_LONG, 0, 0, MPI_COMM_WORLD);
         total_time = MPI_Wtime() - total_time_start;
         fprintf(stdout, "------------\n");
-        fprintf(stdout, "Slave processor %ld : in_circle amount:%ld ; total is %ld\n", myid, in_circle, per_processor_tasks);
+        fprintf(stdout, "Slave processor %ld : in_circle amount:%ld ; total is %ld\n", myid, in_circles, per_processor_tasks);
         fprintf(stdout, "Slave processor %ld spend time: %f s\n", myid, total_time);
 //        fprintf(stdout, "------------\n");
     }
