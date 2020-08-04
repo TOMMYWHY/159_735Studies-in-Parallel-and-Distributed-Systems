@@ -90,8 +90,28 @@ int main(argc,argv)int argc;char *argv[];
         total_time_start = MPI_Wtime();
         MPI_Recv(&n0, 1, MPI_LONG, 0, 0, MPI_COMM_WORLD, &Stat);
         in_circles = is_in_circle(n0);
+        int k ;
+        long int AA,CC;
+        k = myid;
+        AA=1; // pow(a,k)%m
+        for (int e = 0; e < k; e++)
+        {
+            AA=(AA*A)%TWO_32;
+        }
+        //CC
+
+        int a_k,a_0, a_k_ms;
+            a_0=A;
+            for (int j = 0; j < k; j++)
+            {
+                a_k=(a_k*a_0)%TWO_32; // pow(a,k)
+                a_k_ms+=a_k%TWO_32;  // Sum( pow(a,k)mod m )
+                a_0=a_k;
+            }
+        CC = (a_k_ms%TWO_32 *C)%TWO_32;
+
         for(i=1; i<per_processor_tasks; i++){
-            n1 = (A*n1+C) % TWO_32;
+            n1 = (AA*n1+CC) % TWO_32; // TODO
             in_circles += is_in_circle(n1);
             n0 = n1;
         }
