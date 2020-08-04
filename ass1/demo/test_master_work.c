@@ -71,9 +71,10 @@ int main(argc,argv)int argc;char *argv[];
     // C = 1013904223;
     // two_32 = 4294967296;
     //    N = atoi(argv[1]);
-    N =10000000;
+    N =100000000;
 
-    per_processor_tasks = N / (numproc-1);
+    // per_processor_tasks = N / (numproc-1);
+    per_processor_tasks = N / (numproc);
     total = 0;
     if (myid == 0) //  
     {
@@ -83,7 +84,7 @@ int main(argc,argv)int argc;char *argv[];
 
         fprintf(stdout, "Master Processor name: %s\n", processor_name);
         total_time_start = MPI_Wtime();
-        n0 = 1;
+        n0 = 2;
         // Master sends N to all the slave processes
         for  (i=1; i<numproc; i++)
         {
@@ -93,6 +94,25 @@ int main(argc,argv)int argc;char *argv[];
             MPI_Send(&n1, 1, MPI_LONG, i, 0, MPI_COMM_WORLD);
             n0 = n1;
         }
+        int n_m0=1,n_m1;
+        fprintf(stdout, " n0: %d\n",n_m0);
+        n_m1 = (A*n_m0+C) % TWO_32;
+        
+        fprintf(stdout, "Master processor get n0: %d\n",n_m1);
+        total_time_start = MPI_Wtime();
+        in_circles = is_in_circle(n_m1);
+        for(i=1; i<per_processor_tasks; i++){
+            // n1 = (AA*n0+CC) % TWO_32; // TODO
+            n1 = generator(n_m1,numproc-1);
+            in_circles += is_in_circle(n1);
+            n_m1 = n1;
+        }
+        total = in_circles;
+        total_time = MPI_Wtime() - total_time_start;
+        fprintf(stdout, "Master processor %ld : in_circle amount:%ld ; total is %ld\n", myid, in_circles, per_processor_tasks);
+        fprintf(stdout, "Master processor %ld spend time: %f s\n", myid, total_time);
+
+
 
         //receive all slaves
         for (i=1;i<numproc;i++)
