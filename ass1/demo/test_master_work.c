@@ -1,3 +1,9 @@
+/*
+qsub: error while loading shared libraries: libstdc++.so.6: wrong ELF class: ELFCLASS32
+
+*/
+
+
 #include "mpi.h"
 #include <stdio.h>
 #include <math.h>
