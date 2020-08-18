@@ -18,15 +18,16 @@ int is_sorted(float *data, int size)
 }
 
 int compare(const void* x1, const void* x2) {
-  const float* f1 = (float *)x1;
-  const float* f2 =(float *) x2;
+  const float* f1 = x1;
+  const float* f2 = x2;
   float diff = *f1 - *f2;
 
   return (diff < 0) ? -1 : 1;
 }
 
 /********************************************************************/
-int main(int argc, char* argv[]){
+int main(argc, argv)int argc; char* argv[];
+{
   int numproc, myid, N, i;
 //  float *send_all_data, *recv_proc_data;
   const float xmin = 1.0;
@@ -34,7 +35,7 @@ int main(int argc, char* argv[]){
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &numproc);
   MPI_Comm_rank(MPI_COMM_WORLD, &myid);
-
+  
 //  N = atoi(argv[1]);
     N = 16;
 //  const float xmax = N*N ; //the range is big enough //todo
@@ -56,7 +57,7 @@ int main(int argc, char* argv[]){
     {
       send_all_data[i] = drand48()*(xmax-xmin-1)+xmin;
       printf("%f , ",send_all_data[i]);
-    }
+    }          
   }
 
   double total_s = MPI_Wtime();
@@ -81,7 +82,7 @@ int main(int argc, char* argv[]){
 //    float* bucket = calloc(nbuckets*pre_proc_recv_amount, sizeof(float)); // 定义一个大桶，其中，有4个小桶
 //    int nitems[nbuckets];// = (int*)  calloc(nbuckets, sizeof(int)); //the number of items thrown into each bucket 每个小桶中
 //    vector<int> nitems;
-  int* nitems = (int*)calloc(nbuckets, sizeof(int)); //the number of items thrown into each bucket 每个小桶中
+  int* nitems = calloc(nbuckets, sizeof(int)); //the number of items thrown into each bucket 每个小桶中
   float step = (xmax-xmin)/nbuckets;
   for (i=0; i<N/numproc; i++)
   {
@@ -101,8 +102,8 @@ int main(int argc, char* argv[]){
   MPI_Alltoall(nitems, 1, MPI_INT, recvCount, 1, MPI_INT, MPI_COMM_WORLD);
 
   //send and receive displacement //todo
-  int* sdispls = (int*)calloc(nbuckets, sizeof(int));
-  int* rdispls = (int*)calloc(nbuckets, sizeof(int));
+  int* sdispls = (int*)calloc(nbuckets, sizeof(int)); 
+  int* rdispls = (int*)calloc(nbuckets, sizeof(int)); 
   for (i=1; i<nbuckets; i++){
     sdispls[i] = i*pre_proc_recv_amount;
 //    printf("sdispls[%d] %d \n", i, sdispls[i]);
@@ -112,7 +113,7 @@ int main(int argc, char* argv[]){
 
   }
 
-  float* big_bucket = (float*)calloc(N, sizeof(float));// void *recvbuf,
+  float* big_bucket = calloc(N, sizeof(float));// void *recvbuf,
   MPI_Alltoallv(bucket, nitems, sdispls, MPI_FLOAT, big_bucket, recvCount, rdispls, MPI_FLOAT, MPI_COMM_WORLD);
 // nitems : const int *sendcounts,
 //recvCount: const int *recvcounts,
@@ -123,7 +124,7 @@ int main(int argc, char* argv[]){
       totalCount += recvCount[i];
   }
   double sorting_s = MPI_Wtime();
-  //now we have all data in the big bucket, sort
+  //now we have all data in the big bucket, sort  
   qsort(big_bucket, totalCount, sizeof(float), compare);
   double sorting_t = MPI_Wtime()-sorting_s;
 

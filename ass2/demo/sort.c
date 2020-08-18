@@ -1,7 +1,7 @@
 #include "mpi.h"
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 
 
 /********************************************************************/
@@ -18,8 +18,8 @@ int is_sorted(float *data, int size)
 }
 
 int compare(const void* x1, const void* x2) {
-  const float* f1 = x1;
-  const float* f2 = x2;
+  const float* f1 = (float *)x1;
+  const float* f2 =(float *) x2;
   float diff = *f1 - *f2;
 
   return (diff < 0) ? -1 : 1;
@@ -63,7 +63,7 @@ int main(argc, argv)int argc; char* argv[];
   double total_s = MPI_Wtime();
   //scatter the data to each processors
   //fprintf(stdout, "It's processor %d\n\n", myid);
-  MPI_Scatter(&send_all_data, pre_proc_recv_amount, MPI_FLOAT, recv_proc_data, pre_proc_recv_amount, MPI_FLOAT, 0, MPI_COMM_WORLD);
+  MPI_Scatter(send_all_data, pre_proc_recv_amount, MPI_FLOAT, recv_proc_data, pre_proc_recv_amount, MPI_FLOAT, 0, MPI_COMM_WORLD);
   //void*  send_all_data:存储在0号进程的数据，array ；即 全部 N
   //int pre_proc_recv_amount:具体需要给每个进程发送的数据的个数 10
   //void*  recv_proc_data:接收缓存，缓存 recv_count个数据
@@ -82,7 +82,7 @@ int main(argc, argv)int argc; char* argv[];
 //    float* bucket = calloc(nbuckets*pre_proc_recv_amount, sizeof(float)); // 定义一个大桶，其中，有4个小桶
 //    int nitems[nbuckets];// = (int*)  calloc(nbuckets, sizeof(int)); //the number of items thrown into each bucket 每个小桶中
 //    vector<int> nitems;
-  int* nitems = calloc(nbuckets, sizeof(int)); //the number of items thrown into each bucket 每个小桶中
+  int* nitems = (int*)calloc(nbuckets, sizeof(int)); //the number of items thrown into each bucket 每个小桶中
   float step = (xmax-xmin)/nbuckets;
   for (i=0; i<N/numproc; i++)
   {
