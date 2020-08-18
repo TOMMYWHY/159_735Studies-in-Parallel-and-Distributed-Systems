@@ -1,6 +1,9 @@
 #include "mpi.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+
+
 /********************************************************************/
 
 int is_sorted(float *data, int size)
@@ -26,61 +29,64 @@ int compare(const void* x1, const void* x2) {
 int main(argc, argv)int argc; char* argv[];
 {
   int numproc, myid, N, i;
-  float *dSend, *dRecv;
+  float *send_all_data, *recv_proc_data;
   const float xmin = 1.0;
 
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &numproc);
   MPI_Comm_rank(MPI_COMM_WORLD, &myid);
   
-  N = atoi(argv[1]);
-//  const float xmax = N * 10; //the range is big enough //todo
+//  N = atoi(argv[1]);
+    N = 16;
+//  const float xmax = N*N ; //the range is big enough //todo
   const float xmax = N ; //the range is big enough //todo
-  int nrecv = N/numproc; // pre_proc_num
-  dSend = (float*)malloc(N*sizeof(float)); // N_container
-  dRecv = (float*)malloc(nrecv*sizeof(float)); // pre_proc_get_count_container
+  int pre_proc_recv_amount = N/numproc; // pre_proc_num
+  send_all_data = (float*)malloc(N*sizeof(float)); // N_container
+  recv_proc_data = (float*)malloc(pre_proc_recv_amount*sizeof(float)); // pre_proc_get_count_container
 
   //the master processor generates N*numproc random numbers and makes sure they are not sorted.
   if (myid == 0)
   {
     fprintf(stdout, "Generating %d numbers to be sorted on %d processors\n", N, numproc);
-      printf("each proc get %d \n",nrecv);
+      printf("each proc get %d \n",pre_proc_recv_amount);
 
       for (i=0; i<N; i++)
     {
-      dSend[i] = drand48()*(xmax-xmin-1)+xmin;
+      send_all_data[i] = drand48()*(xmax-xmin-1)+xmin;
+      printf("%f , ",send_all_data[i]);
     }          
   }
 
   double total_s = MPI_Wtime();
   //scatter the data to each processors
   //fprintf(stdout, "It's processor %d\n\n", myid);
-  MPI_Scatter(dSend, nrecv, MPI_FLOAT, dRecv, nrecv, MPI_FLOAT, 0, MPI_COMM_WORLD);
-  //void*  dSend:存储在0号进程的数据，array ；即 全部 N
-  //int nrecv:具体需要给每个进程发送的数据的个数 10
-  //void*  dRecv:接收缓存，缓存 recv_count个数据
+  MPI_Scatter(send_all_data, pre_proc_recv_amount, MPI_FLOAT, recv_proc_data, pre_proc_recv_amount, MPI_FLOAT, 0, MPI_COMM_WORLD);
+  //void*  send_all_data:存储在0号进程的数据，array ；即 全部 N
+  //int pre_proc_recv_amount:具体需要给每个进程发送的数据的个数 10
+  //void*  recv_proc_data:接收缓存，缓存 recv_count个数据
 
-  for (i=0; i<N/numproc; i++)
+/*  for (i=0; i<pre_proc_recv_amount; i++)
   {
-    fprintf(stdout, "%f ", dRecv[i]); // 每个processor收到的数据
+    fprintf(stdout, "%f ", recv_proc_data[i]); // 每个processor收到的数据
   }
   fprintf(stdout, "\n");
-  fprintf(stdout, "\n");
+  fprintf(stdout, "\n");*/
 
-  //create numproc buckets and put the numbers into correct buckets, memory size is numproc*nrecv
+  //create numproc buckets and put the numbers into correct buckets, memory size is numproc*pre_proc_recv_amount
   double bucketing_s = MPI_Wtime();
   int nbuckets = numproc;
-  float* bucket = calloc(nbuckets*nrecv, sizeof(float)); // 定义一个大桶，其中，有4个小桶
+  float* bucket = calloc(nbuckets*pre_proc_recv_amount, sizeof(float)); // 定义一个大桶，其中，有4个小桶
   int* nitems = calloc(nbuckets, sizeof(int)); //the number of items thrown into each bucket 每个小桶中
   float step = (xmax-xmin)/nbuckets;
   for (i=0; i<N/numproc; i++)
   {
-    int bktno = (int)((dRecv[i] - xmin)/step); //dRecv[i] 所在桶的编号
-    int index = bktno * nrecv + nitems[bktno];//todo
-      printf("DATA %d %f %d %d\n", i, dRecv[i], bktno, index);
+    int bktno = (int)((recv_proc_data[i] - xmin)/step); //recv_proc_data[i] 所在桶的编号
+    int index = bktno * pre_proc_recv_amount + nitems[bktno];//todo
+      printf("DATA %d %f %d %d\n", i, recv_proc_data[i], bktno, index);
 
-      bucket[index] = dRecv[i];
+      bucket[index] = recv_proc_data[i];
     ++nitems[bktno];
+//      printf("*******\n");
   }
   double bucketing_t = MPI_Wtime() - bucketing_s; // partitioning bucket
 
@@ -93,7 +99,7 @@ int main(argc, argv)int argc; char* argv[];
   int* sdispls = (int*)calloc(nbuckets, sizeof(int)); 
   int* rdispls = (int*)calloc(nbuckets, sizeof(int)); 
   for (i=1; i<nbuckets; i++){
-    sdispls[i] = i*nrecv;
+    sdispls[i] = i*pre_proc_recv_amount;
 //    printf("sdispls[%d] %d \n", i, sdispls[i]);
 
     rdispls[i] = rdispls[i-1]+recvCount[i-1];
@@ -124,19 +130,19 @@ int main(argc, argv)int argc; char* argv[];
       rdispls[i] = rdispls[i-1] +  recvCount[i-1];
   }
 
-  MPI_Gatherv(big_bucket, totalCount, MPI_FLOAT, dSend, recvCount, rdispls, MPI_FLOAT, 0, MPI_COMM_WORLD);
-    printf("------------------ \n");
+  MPI_Gatherv(big_bucket, totalCount, MPI_FLOAT, send_all_data, recvCount, rdispls, MPI_FLOAT, 0, MPI_COMM_WORLD);
+//    printf("------------------ \n");
 
-    if (myid == 0 && is_sorted(dSend, N)){
+    if (myid == 0 && is_sorted(send_all_data, N)){
       fprintf(stdout, "total time: %f, parallel: %f\n", MPI_Wtime()-total_s, bucketing_t+sorting_t);
-      fprintf(stdout, "The data array is sorted, from %f to %f\n", dSend[0], dSend[N-1]);
+      fprintf(stdout, "The data array is sorted, from %f to %f\n", send_all_data[0], send_all_data[N-1]);
       for(i=0;i<N;i++){
-          printf("%f, ",dSend[i]);
+          printf("%f, ",send_all_data[i]);
       }
       printf("\n");
 
   }
-    printf("------------------ \n");
+    printf("====================== \n");
 
     MPI_Finalize();
   return 0;
