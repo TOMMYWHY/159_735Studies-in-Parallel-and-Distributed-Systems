@@ -29,7 +29,7 @@ int compare(const void* x1, const void* x2) {
 int main(argc, argv)int argc; char* argv[];
 {
   int numproc, myid, N, i;
-  float *send_all_data, *recv_proc_data;
+//  float *send_all_data, *recv_proc_data;
   const float xmin = 1.0;
 
   MPI_Init(&argc, &argv);
@@ -41,8 +41,11 @@ int main(argc, argv)int argc; char* argv[];
 //  const float xmax = N*N ; //the range is big enough //todo
   const float xmax = N ; //the range is big enough //todo
   int pre_proc_recv_amount = N/numproc; // pre_proc_num
-  send_all_data = (float*)malloc(N*sizeof(float)); // N_container
-  recv_proc_data = (float*)malloc(pre_proc_recv_amount*sizeof(float)); // pre_proc_get_count_container
+  float send_all_data [N];
+//  vector<float> send_all_data [N];
+// float * send_all_data = (float*)malloc(N*sizeof(float)); // N_container
+//    float recv_proc_data [pre_proc_recv_amount];
+    float * recv_proc_data = (float*)malloc(pre_proc_recv_amount*sizeof(float)); // pre_proc_get_count_container
 
   //the master processor generates N*numproc random numbers and makes sure they are not sorted.
   if (myid == 0)
@@ -60,7 +63,7 @@ int main(argc, argv)int argc; char* argv[];
   double total_s = MPI_Wtime();
   //scatter the data to each processors
   //fprintf(stdout, "It's processor %d\n\n", myid);
-  MPI_Scatter(send_all_data, pre_proc_recv_amount, MPI_FLOAT, recv_proc_data, pre_proc_recv_amount, MPI_FLOAT, 0, MPI_COMM_WORLD);
+  MPI_Scatter(&send_all_data, pre_proc_recv_amount, MPI_FLOAT, recv_proc_data, pre_proc_recv_amount, MPI_FLOAT, 0, MPI_COMM_WORLD);
   //void*  send_all_data:存储在0号进程的数据，array ；即 全部 N
   //int pre_proc_recv_amount:具体需要给每个进程发送的数据的个数 10
   //void*  recv_proc_data:接收缓存，缓存 recv_count个数据
@@ -75,7 +78,10 @@ int main(argc, argv)int argc; char* argv[];
   //create numproc buckets and put the numbers into correct buckets, memory size is numproc*pre_proc_recv_amount
   double bucketing_s = MPI_Wtime();
   int nbuckets = numproc;
-  float* bucket = calloc(nbuckets*pre_proc_recv_amount, sizeof(float)); // 定义一个大桶，其中，有4个小桶
+      float bucket[nbuckets*pre_proc_recv_amount];// = (float*) calloc(nbuckets*pre_proc_recv_amount, sizeof(float)); // 定义一个大桶，其中，有4个小桶
+//    float* bucket = calloc(nbuckets*pre_proc_recv_amount, sizeof(float)); // 定义一个大桶，其中，有4个小桶
+//    int nitems[nbuckets];// = (int*)  calloc(nbuckets, sizeof(int)); //the number of items thrown into each bucket 每个小桶中
+//    vector<int> nitems;
   int* nitems = calloc(nbuckets, sizeof(int)); //the number of items thrown into each bucket 每个小桶中
   float step = (xmax-xmin)/nbuckets;
   for (i=0; i<N/numproc; i++)

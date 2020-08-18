@@ -1,9 +1,8 @@
 #include "mpi.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include<vector>
-
-
+#include <cstring>
+using namespace std;
 
 /********************************************************************/
 
@@ -92,8 +91,9 @@ int main(int argc, char* argv[]){
 
   //now empty the small buckets to large buckets
   //first we need to let each processor know how many number it needs to receive
-//  int* recvCount = (int*)calloc(nbuckets, sizeof(int)); //buckets
-  int recvCount[nbuckets];
+  int* recvCount = (int*)calloc(nbuckets, sizeof(int)); //buckets
+
+
   MPI_Alltoall(nitems, 1, MPI_INT, recvCount, 1, MPI_INT, MPI_COMM_WORLD);
 
   //send and receive displacement //todo
