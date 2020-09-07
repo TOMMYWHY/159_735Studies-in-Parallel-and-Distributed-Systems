@@ -9,28 +9,9 @@
 using namespace std;
 
 
-/********************************************************************/
+int is_sorted(float *data, int size);
+int compare(const void* x1, const void* x2);
 
-int is_sorted(float *data, int size)
-{
-    int i;
-    for (i=0; i<size; i++){
-        if ( data[i] < data[i-1]){
-            return 0;
-        }
-    }
-    return 1;
-}
-
-int compare(const void* x1, const void* x2) {
-  const float* f1 = (float *)x1;
-  const float* f2 =(float *) x2;
-  float diff = *f1 - *f2;
-
-  return (diff < 0) ? -1 : 1;
-}
-
-/********************************************************************/
 int main(int argc, char* argv[]){
   int numproc, myid, N, i;
 //  float *send_all_data, *recv_proc_data;
@@ -40,8 +21,8 @@ int main(int argc, char* argv[]){
   MPI_Comm_size(MPI_COMM_WORLD, &numproc);
   MPI_Comm_rank(MPI_COMM_WORLD, &myid);
 
-//  N = atoi(argv[1]);
-    N = 16;
+  N = atoi(argv[1]);
+//    N = 16;
 //  const float xmax = N*N ; //the range is big enough //todo
   const float xmax = N ; //the range is big enough //todo
   int pre_proc_recv_amount = N/numproc; // pre_proc_num
@@ -149,3 +130,24 @@ int main(int argc, char* argv[]){
     MPI_Finalize();
   return 0;
 }
+/********************************************************************/
+
+int compare(const void* x1, const void* x2) {
+    const float* f1 = (float *)x1;
+    const float* f2 =(float *) x2;
+    float diff = *f1 - *f2;
+
+    return (diff < 0) ? -1 : 1;
+}
+
+int is_sorted(float *data, int size)
+{
+    int i;
+    for (i=0; i<size; i++){
+        if ( data[i] < data[i-1]){
+            return 0;
+        }
+    }
+    return 1;
+}
+
