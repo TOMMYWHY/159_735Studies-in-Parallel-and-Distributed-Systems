@@ -82,6 +82,12 @@ int main(int argc, char *argv[]){
 //    N = atoi(argv[1]);
     N =300000000;
 
+/*    if (N == 0)
+    {
+        test_comm_time(myid,numproc);
+        MPI_Finalize();
+        return 0;
+    }*/
 
 
 
@@ -181,4 +187,32 @@ unsigned long get_n_k(unsigned long n, unsigned long A, unsigned long C){
     return (A*n+C) % TWO_32;
 }
 
+/*
+void test_comm_time(int myid, int numproc){
+    int i;
 
+    unsigned long data_send, data_recv;
+    double time_start, time_spend;
+    MPI_Status Stat;
+    if (myid == 0)
+    {
+        data_send = 4294967296;
+
+        for ( i=1; i<numproc; i++)
+        {
+            time_start = MPI_Wtime();
+            MPI_Send(&data_send, 1, MPI_LONG, i, 0, MPI_COMM_WORLD);
+            MPI_Recv(&data_recv, 1, MPI_LONG, i, 0, MPI_COMM_WORLD, &Stat);
+            time_spend = MPI_Wtime() - time_start;
+            cout <<"Master 0 spends "<< time_spend <<" to communicate with salve:" << i <<endl;
+        }
+    }
+    else
+    {
+        time_start = MPI_Wtime();
+        MPI_Recv(&data_recv, 1, MPI_LONG, i, 0, MPI_COMM_WORLD, &Stat);
+        MPI_Send(&data_recv, 1, MPI_LONG, i, 0, MPI_COMM_WORLD);
+        time_spend = MPI_Wtime() - time_start;
+    }
+
+}*/
