@@ -29,24 +29,25 @@ int main(int argc, char* argv[]){
   float* send_all_data = new float [N]();
   float* recv_proc_data = new float [pre_proc_recv_amount]();
 
-  //the master processor generates N*numproc random numbers and makes sure they are not sorted.
   if (myid == 0)
   {
     cout << "Generate " <<N <<" numbers to be sorted on " << numproc<<" processors" <<endl;
-    cout << "each proc get " <<pre_proc_recv_amount <<endl;
+    cout << "each proc get " <<pre_proc_recv_amount << " numbers."<<endl;
 
+    cout <<"unsorted numbers: " ;
       for (i=0; i<N; i++)
     {
-      send_all_data[i] = drand48()*(xmax-xmin-1)+xmin;
+      send_all_data[i] = drand48()*(xmax-xmin-1)+xmin; //generates N*numproc random numbers
         cout <<send_all_data[i] <<" , ";
     }
       cout << "\n"<<endl;
+      cout << "----------------"<< endl;
   }
 
   double start_time = MPI_Wtime();
   //scatter the data to each processors
   MPI_Scatter(send_all_data, pre_proc_recv_amount, MPI_FLOAT, recv_proc_data, pre_proc_recv_amount, MPI_FLOAT, 0, MPI_COMM_WORLD);
-  //void*  send_all_data:存储在0号进程的数据，array ；即 全部 N
+  //void* send_all_data: 存储在0号进程的数据，array ；即 全部 N
   //int pre_proc_recv_amount:具体需要给每个进程发送的数据的个数 10
   //void*  recv_proc_data:接收缓存，缓存 recv_count个数据
 
