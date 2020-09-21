@@ -14,6 +14,7 @@ int compare(const void* x1, const void* x2);
 
 int main(int argc, char* argv[]){
   int numproc, myid, N, i;
+//  float *send_all_data, *recv_proc_data;
   const float xmin = 1.0;
 
   MPI_Init(&argc, &argv);
@@ -22,6 +23,7 @@ int main(int argc, char* argv[]){
 
   N = atoi(argv[1]);
 //    N = 16;
+//  const float xmax = N*N ; //the range is big enough //todo
   const float xmax = N ; //the range is big enough //todo
   int pre_proc_recv_amount = N/numproc; // pre_proc_num
   float* send_all_data = new float [N]();
@@ -31,14 +33,16 @@ int main(int argc, char* argv[]){
   {
     cout << "Generate " <<N <<" numbers to be sorted on " << numproc<<" processors" <<endl;
     cout << "each proc get " <<pre_proc_recv_amount << " numbers."<<endl;
-//    cout <<"unsorted numbers: " ;
+
+    /* print unsorted numbers*/
+    /*cout <<"unsorted numbers: " ;
       for (i=0; i<N; i++)
     {
       send_all_data[i] = drand48()*(xmax-xmin-1)+xmin; //generates N*numproc random numbers
-//        cout <<send_all_data[i] <<" , ";
+        cout <<send_all_data[i] <<" , ";
     }
       cout << "\n"<<endl;
-      cout << "-------*******---------"<< endl;
+      cout << "----------------"<< endl;*/
   }
 
   double start_time = MPI_Wtime();
@@ -54,6 +58,7 @@ int main(int argc, char* argv[]){
   }
     cout<<endl;*/
 
+  //create numproc buckets and put the numbers into correct buckets, memory size is numproc*pre_proc_recv_amount
   double bucket_start_time = MPI_Wtime();
   int nbuckets = numproc;
       float* bucket=new float[nbuckets*pre_proc_recv_amount]();//  定义一个大桶，其中，有4个小桶
@@ -63,13 +68,20 @@ int main(int argc, char* argv[]){
   {
     int bktno = (int)((recv_proc_data[i] - xmin)/step); //recv_proc_data[i] 所在桶的编号
     int index = bktno * pre_proc_recv_amount + nitems[bktno];//todo
-      cout << i <<",  num: " << recv_proc_data[i]<<" , buckets num:"<<bktno<<" , index:" <<index <<endl;
+//      printf("DATA %d %f %d %d\n", i, recv_proc_data[i], bktno, index);
+      cout << "processor: " <<i <<" , num: " << recv_proc_data[i]<<" , buckets num:"<<bktno<<" , index:" <<index <<endl;
       bucket[index] = recv_proc_data[i];
     nitems[bktno]++;
+//      printf("*******\n");
   }
   double bucket_end_time = MPI_Wtime() - bucket_start_time; // partitioning bucket
+
+  //now empty the small buckets to large buckets
+  //first we need to let each processor know how many number it needs to receive
   int * recvCount = new int [nbuckets]();// = (int*)calloc(nbuckets, sizeof(int)); //buckets
   MPI_Alltoall(nitems, 1, MPI_INT, recvCount, 1, MPI_INT, MPI_COMM_WORLD);
+
+  //send and receive displacement //todo
   int* sdispls = new int [nbuckets]();
   int* rdispls = new int [nbuckets]();
   for (i=1; i<nbuckets; i++){
@@ -93,6 +105,8 @@ int main(int argc, char* argv[]){
   //now we have all data in the big bucket, sort
   qsort(big_bucket, totalCount, sizeof(float), compare);
   double sort_end_time = MPI_Wtime()-sort_start_time;
+
+  //gather the result
   memset(recvCount, 0, nbuckets*sizeof(int));
   MPI_Gather(&totalCount, 1, MPI_INT, recvCount, 1, MPI_INT,0, MPI_COMM_WORLD);
   rdispls[0] = 0;
@@ -101,33 +115,30 @@ int main(int argc, char* argv[]){
   }
 
   MPI_Gatherv(big_bucket, totalCount, MPI_FLOAT, send_all_data, recvCount, rdispls, MPI_FLOAT, 0, MPI_COMM_WORLD);
-    if (myid == 0 && is_sorted(send_all_data, N)){
-        double total_time = MPI_Wtime()-start_time;
-        double parallel_time =  bucket_end_time+sort_end_time;
-        double serial_time = total_time - parallel_time;
-        cout << "Sort total time :" << total_time<<" s"<< endl;
-        cout << "serial time :" << serial_time<<" s"<< endl;
-        cout << "Parallel partition time:"<< parallel_time<<" s"<<endl;
+//    printf("------------------ \n");
 
-    /*    cout<<"sorted result:" <<endl;
+    if (myid == 0 && is_sorted(send_all_data, N)){
+        cout << "sorted total time :" << MPI_Wtime()-start_time <<" s"<< endl;
+        cout << "parallel partition time:"<< bucket_end_time+sort_end_time <<" s"<<endl;
+        cout << "The data sorted from"<<send_all_data[0] << " to " << send_all_data[N-1]<<endl;
+
+        /*print sorted numbers*/
+     /*   cout<<"sorted result:" <<endl;
         for(i=0;i<N;i++){
             cout << send_all_data[i] << " , ";
         }
-        cout <<endl;
-*/
+        cout <<endl;*/
 
-        double temp=0.0;
-        int num=0;
+     double temp=0.0;
         for(i=0;i<N;i++){
-//            cout << send_all_data[i] << " , ";
+            cout << send_all_data[i] << " , ";
             if(send_all_data[i]>=temp){
                 temp = send_all_data[i];
-                num++;
             }else{
                 cout << "fail..."<<endl;
             }
         }
-        cout<< "Total sort numbers: "<< num << ", " << " and the data sorted from"<<send_all_data[0] << " to " << send_all_data[N-1]<<endl;
+
   }
     cout<<"=========================================="<<endl;
 
