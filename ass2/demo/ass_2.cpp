@@ -22,6 +22,9 @@ int main(int argc, char* argv[]){
 
   N = atoi(argv[1]);
 //    N = 16;
+
+
+
   const float xmax = N ; //the range is big enough //todo
   int pre_proc_recv_amount = N/numproc; // pre_proc_num
   float* send_all_data = new float [N]();
@@ -29,15 +32,15 @@ int main(int argc, char* argv[]){
 
   if (myid == 0)
   {
-    cout << "Generate " <<N <<" numbers to be sorted on " << numproc<<" processors" <<endl;
-    cout << "each proc get " <<pre_proc_recv_amount << " numbers."<<endl;
+    cout << "Generate " <<N <<" numbers to be sorted on " << numproc<<" processors." <<endl;
+    cout << "Each processor get " <<pre_proc_recv_amount << " numbers."<<endl;
 //    cout <<"unsorted numbers: " ;
       for (i=0; i<N; i++)
     {
       send_all_data[i] = drand48()*(xmax-xmin-1)+xmin; //generates N*numproc random numbers
 //        cout <<send_all_data[i] <<" , ";
     }
-      cout << "\n"<<endl;
+//      cout << "\n"<<endl;
       cout << "-------*******---------"<< endl;
   }
 
