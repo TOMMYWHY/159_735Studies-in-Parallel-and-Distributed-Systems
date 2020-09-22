@@ -16,8 +16,11 @@ CFLAGS = -w -O3
 OBJS = fitsfile.o
 
 # Link to CFITSIO libraries - modify these paths accordingly
-LIBP = -L/home/iabond/cfitsio
-INCP = -I/home/iabond/cfitsio
+# LIBP = -L/home/iabond/cfitsio
+# INCP = -I/home/iabond/cfitsio
+
+LIBP = -L/usr/local/Cellar/cfitsio/3.490/lib
+INCP = -I/usr/local/Cellar/cfitsio/3.490/include
 
 LIBS = -lcfitsio -lm
 
