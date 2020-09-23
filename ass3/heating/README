@@ -37,3 +37,6 @@ solution. You need to modify this to implement heat transfer as discussed in
 the lectures. It is suggested you copy heat_demo.cpp to another source program 
 and work on that. You will then need to make another entry in the makefile.
 
+
+> mpi 使用进程
+> omp 使用线程；不能用在非共享内存系统（mighty 集群）
