@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
   const int npix = atoi(argv[1]);
   const int npixx = npix;
   const int npixy = npix;
-  const int ntotal = npixx * npixy;
+  const int ntotal = npixx * npixy;//todo
   const float tol = 0.00001;
   // Images as 2D arrays: h is the current image, g is the updated
   // image. To access individual pixel elements, use the () operator. 
