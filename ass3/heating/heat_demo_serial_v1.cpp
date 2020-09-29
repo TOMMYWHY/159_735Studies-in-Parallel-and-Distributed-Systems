@@ -23,36 +23,37 @@ To run (for example to make a 100X100 pixel image):
 #include "arrayff.hxx"
 #include "draw.hxx"
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
     const float tol = 0.00001;
 
     // X and Y dimensions. Force it to be a square.
-  const int npix = atoi(argv[1]);
-  const int npixx = npix;
-  const int npixy = npix;
-  const int ntotal = npixx * npixy;
+    const int npix = atoi(argv[1]);
+    const int npixx = npix;
+    const int npixy = npix;
+    const int ntotal = npixx * npixy;
 
-  // Images as 2D arrays: h is the current image, g is the updated
-  // image. To access individual pixel elements, use the () operator. 
-  // Note: that y is the first index (to reflect row major
-  // order). Eg: h(y, x) = fubar
-  Array<float, 2> h(npixy, npixx), g(npixy, npixx);
+    // Images as 2D arrays: h is the current image, g is the updated
+    // image. To access individual pixel elements, use the () operator.
+    // Note: that y is the first index (to reflect row major
+    // order). Eg: h(y, x) = fubar
+    Array<float, 2> h(npixy, npixx), g(npixy, npixx);
     const int nrequired = npixx * npixy;
     const int ITMAX = 1000000;
     int iter = 0;
     int nconverged = 0;
 
-  // Draw the printed circuit components
-  fix_boundaries2<float>(h);
+    // Draw the printed circuit components
+    fix_boundaries2<float>(h);
 
-  // This is the initial value image where the boundaries and printed
-  // circuit components have been fixed
+    // This is the initial value image where the boundaries and printed
+    // circuit components have been fixed
 //  dump_array<float, 2>(h, "plate0.fit");
 
-  // Complete the sequential version to compute the heat transfer,
-  // then make a parallel version of it
+    // Complete the sequential version to compute the heat transfer,
+    // then make a parallel version of it
 
+    double t_start = omp_get_wtime();
     do {
 
         for (int y = 1; y < npixy-1; ++y) {
@@ -75,6 +76,9 @@ int main(int argc, char* argv[])
 
     } while (nconverged < nrequired && iter < ITMAX);
 
+    std::cout << "It takes " << omp_get_wtime() - t_start << " seconds\n"<< std::endl;
+
     dump_array<float, 2>(h, "plate1.fit");
+
     std::cout << "Required " << iter << " iterations" << std::endl;
 }

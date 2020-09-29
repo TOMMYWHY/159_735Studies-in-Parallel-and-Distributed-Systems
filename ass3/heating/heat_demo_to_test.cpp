@@ -6,8 +6,6 @@
 #include "arrayff.hxx"
 #include "draw.hxx"
 
-using namespace std;
-
 void calc_seq()
 {
     const float tol = 0.00001;
@@ -48,7 +46,7 @@ void calc_seq()
         ++iter;
 
     } while (nconverged < nrequired && iter < ITMAX);
-    cout << "nconverged:"<<nconverged <<endl;
+
     std::cout << "It takes " << omp_get_wtime() - t_start << " seconds\n";
     dump_array<float, 2>(h, "plate1.fit");
     std::cout << "Required " << iter << " iterations" << std::endl;
@@ -56,7 +54,7 @@ void calc_seq()
 
 int main(int argc, char* argv[])
 {
-//    calc_seq();
+    calc_seq();
 
     const float tol = 0.00001;
     const int ITMAX = 1000000;
@@ -64,8 +62,7 @@ int main(int argc, char* argv[])
     const int npixx = npix;
     const int npixy = npix;
 
-//    const int nprocs = omp_get_num_procs();
-    const int nprocs = 4;
+    const int nprocs = omp_get_num_procs();
     std::cout << "there are " << nprocs << " processors." << std::endl;
 
     Array<float, 2> h(npixy, npixy), g(npixy, npixx);
@@ -75,16 +72,15 @@ int main(int argc, char* argv[])
     //no need to check the 4 boundariess
     const int nrequired = (npixx - 2)*(npixy - 2);
     int nconverged = 0;
-//    omp_set_dynamic(0);
+    omp_set_dynamic(0);
     omp_set_num_threads(nprocs);
     int iter = 0;
     double t_start = omp_get_wtime();
-
     for (iter = 0; iter < ITMAX; iter++)
     {
 #pragma omp parallel
         {
-/*            int nThreads = omp_get_num_threads();
+            int nThreads = omp_get_num_threads();
             int myId = omp_get_thread_num();
             //split the plate into nThreads parts and each thread is working on one part
             int step = npixy / nThreads;
@@ -93,9 +89,10 @@ int main(int argc, char* argv[])
             if (yStart == 0)
                 yStart = 1;
             if (myId == nThreads - 1)
-                yEnd = npixy - 1;*/
-#pragma omp  for collapse(2)
-            for (int y = 1; y < npixx-1; y++)
+                yEnd = npixy - 1;
+
+#pragma omp parallel for
+            for (int y = yStart; y < yEnd; y++)
             {
                 for (int x = 1; x < npixx - 1; x++)
                 {
@@ -104,33 +101,28 @@ int main(int argc, char* argv[])
             }
 
 #pragma omp barrier
-//#pragma omp single //'single' implies a barrier at the end of the block, 'master' won't.
+#pragma omp single //'single' implies a barrier at the end of the block, 'master' won't.
             {
                 fix_boundaries2(g);
                 nconverged = 0;
             }
 
-#pragma omp for collapse(2) reduction (+:nconverged)
-            for (int y = 1; y < npixx - 1; y++)
+#pragma omp parallel for reduction (+:nconverged) //calculate the converged cells
+            for (int y = yStart; y < yEnd; y++)
             {
                 for (int x = 1; x < npixx - 1; x++)
                 {
-                    float dhg = std::fabs(g(y, x) - h(y, x));
-
+                    float dhg = fabs(g(y, x) - h(y, x));
                     if (dhg < tol)
                         nconverged += 1;
                     h(y, x) = g(y, x);
                 }
             }
-//#pragma omp barrier
         }
-//        cout<< "nconverged:" <<nconverged <<endl;
         if (nconverged == nrequired)
             break;
     }
-    cout<< "nconverged:" <<nconverged <<endl;
-
     dump_array<float, 2>(h, "plate1.fit");
-    std::cout << "It takes " << omp_get_wtime() - t_start << " seconds\n"<< std::endl;
+    std::cout << "It takes " << omp_get_wtime() - t_start << " seconds\n";
     std::cout << "Executed " << iter << " iterations to converge." << std::endl;
 }

@@ -56,7 +56,7 @@ void calc_seq()
 
 int main(int argc, char* argv[])
 {
-//    calc_seq();
+    calc_seq();
 
     const float tol = 0.00001;
     const int ITMAX = 1000000;
@@ -70,19 +70,19 @@ int main(int argc, char* argv[])
 
     Array<float, 2> h(npixy, npixy), g(npixy, npixx);
     fix_boundaries2(h);
-//    dump_array<float, 2>(h, "plate0.fit");
+    dump_array<float, 2>(h, "plate0.fit");
 
     //no need to check the 4 boundariess
     const int nrequired = (npixx - 2)*(npixy - 2);
     int nconverged = 0;
-//    omp_set_dynamic(0);
+    omp_set_dynamic(0);
     omp_set_num_threads(nprocs);
     int iter = 0;
     double t_start = omp_get_wtime();
 
     for (iter = 0; iter < ITMAX; iter++)
     {
-#pragma omp parallel
+//#pragma omp parallel
         {
 /*            int nThreads = omp_get_num_threads();
             int myId = omp_get_thread_num();
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
                 yStart = 1;
             if (myId == nThreads - 1)
                 yEnd = npixy - 1;*/
-#pragma omp  for collapse(2)
+//#pragma omp  for collapse(2)
             for (int y = 1; y < npixx-1; y++)
             {
                 for (int x = 1; x < npixx - 1; x++)
@@ -103,14 +103,14 @@ int main(int argc, char* argv[])
                 }
             }
 
-#pragma omp barrier
+//#pragma omp barrier
 //#pragma omp single //'single' implies a barrier at the end of the block, 'master' won't.
             {
                 fix_boundaries2(g);
                 nconverged = 0;
             }
 
-#pragma omp for collapse(2) reduction (+:nconverged)
+//#pragma omp for collapse(2) reduction (+:nconverged)
             for (int y = 1; y < npixx - 1; y++)
             {
                 for (int x = 1; x < npixx - 1; x++)
