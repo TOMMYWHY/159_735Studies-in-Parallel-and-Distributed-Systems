@@ -19,8 +19,8 @@ To run (for example to make a 100X100 pixel image):
 #include <vector>
 #include <cmath>
 #include <omp.h>
-#include "arrayff.hxx"
-#include "draw.hxx"
+#include "../arrayff.hxx"
+#include "../draw.hxx"
 
 
 using namespace std;

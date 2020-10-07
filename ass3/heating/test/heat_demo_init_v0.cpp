@@ -16,8 +16,8 @@ To run (for example to make a 100X100 pixel image):
 ******************************************************************************/
 #include <iostream>
 
-#include "arrayff.hxx"
-#include "draw.hxx"
+#include "../arrayff.hxx"
+#include "../draw.hxx"
 
 int main(int argc, char* argv[]) 
 {

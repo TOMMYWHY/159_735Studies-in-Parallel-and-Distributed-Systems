@@ -3,8 +3,8 @@
 #include <vector>
 #include <cmath>
 #include <omp.h>
-#include "arrayff.hxx"
-#include "draw.hxx"
+#include "../arrayff.hxx"
+#include "../draw.hxx"
 
 void calc_seq()
 {

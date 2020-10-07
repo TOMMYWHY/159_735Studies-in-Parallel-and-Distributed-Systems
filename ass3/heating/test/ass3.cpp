@@ -19,8 +19,8 @@ To run (for example to make a 100X100 pixel image):
 #include <vector>
 #include <cmath>
 #include <omp.h>
-#include "arrayff.hxx"
-#include "draw.hxx"
+#include "../arrayff.hxx"
+#include "../draw.hxx"
 
 #define NUM_THREADS 80
 
@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
       for (int x = 0; x < npixx; ++x) {
         float dhg = std::fabs(g(y, x) - h(y, x));
         if (dhg < tol) {
-            ++nconverged[id]; //affected by other processess?
+            ++nconverged[id];
         }
         h(y, x) = g(y, x);
       }
