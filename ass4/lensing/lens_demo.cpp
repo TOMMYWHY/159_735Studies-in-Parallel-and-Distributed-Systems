@@ -13,7 +13,7 @@
 
 #include "lenses.h"
 #include "arrayff.hxx"
-
+using namespace std;
 // Global variables! Not nice style, but we'll get away with it here.
 
 // Boundaries in physical units on the lens plane
@@ -35,14 +35,15 @@ double diffclock(clock_t clock1,clock_t clock2)
 
 int main(int argc, char* argv[])
 {
+    const int len_num = atoi(argv[1]);
     // Set up lensing system configuration - call example_1, _2, _3 or
     // _n as you wish. The positions and mass fractions of the lenses
     // are stored in these arrays
     float* xlens;
     float* ylens;
     float* eps;
-//    const int nlenses = set_example_n(100, &xlens, &ylens, &eps);
-    const int nlenses = set_example_3( &xlens, &ylens, &eps);
+//    const int nlenses = set_example_n(len_num, &xlens, &ylens, &eps);
+    const int nlenses = set_example_2( &xlens, &ylens, &eps);
     std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
 
     // Source star parameters. You can adjust these if you like - it is
@@ -64,6 +65,7 @@ int main(int argc, char* argv[])
 
     // Put the lens image in this array
     Array<float, 2> lensim(npixy, npixx);
+    cout << "lensim.ntotal: "<<lensim.ntotal <<endl;
 
     clock_t tstart = clock();
 
@@ -96,11 +98,11 @@ int main(int argc, char* argv[])
 
     clock_t tend = clock();
     double tms = diffclock(tend, tstart);
-    std::cout << "# Time elapsed: " << tms << " ms " << numuse << std::endl;
+    std::cout << "# Time elapsed: " << tms << " ms;--- " << tms/1000 << "s" << std::endl;
 
     // Write the lens image to a FITS formatted file. You can view this
     // image file using ds9
-    dump_array<float, 2>(lensim, "lens_s100.fit");
+    dump_array<float, 2>(lensim, "lens.fit");
 
     delete[] xlens;
     delete[] ylens;
