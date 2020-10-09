@@ -26,7 +26,7 @@ const float YL2 =  WL;
 
 //device
 __device__ void shoot(float& xs, float& ys, float xl, float yl,
-  float* xlens, float* ylen`s, float* eps, int nlenses)
+  float* xlens, float* ylens, float* eps, int nlenses)
 {
 float dx, dy, dr;
 xs = xl;
@@ -63,17 +63,7 @@ __global__ void cuda_shoot(float* lensim, int xsize, int ysize, float lens_scale
 
   float xs, ys;
 
-  shoot(xs, ys, xl, yl, xlens, ylens, eps, nlenses)
-  // float xs = xl; // shoot()
-  // float ys = yl;
-
-  // for (int p = 0; p < nlenses; ++p) {
-  //   float dx = xl - xlens[p];
-  //   float dy = yl - ylens[p];
-  //   float dr = dx * dx + dy * dy;
-  //   xs -= eps[p] * dx / dr;
-  //   ys -= eps[p] * dy / dr;
-  // }
+  shoot(xs, ys, xl, yl, xlens, ylens, eps, nlenses);
 
   float xd = xs - xsrc;
   float yd = ys - ysrc;
@@ -113,8 +103,8 @@ int main(int argc, char* argv[])
     float* xlens;
     float* ylens;
     float* eps;
-//    const int nlenses = set_example_3(&xlens, &ylens, &eps);
-    const int nlenses = set_example_n(len_num, &xlens, &ylens, &eps);
+   const int nlenses = set_example_3(&xlens, &ylens, &eps);
+    // const int nlenses = set_example_n(len_num, &xlens, &ylens, &eps);
 
     std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
 
@@ -154,7 +144,8 @@ int main(int argc, char* argv[])
   std::cout << "# Time elapsed: " << tms << " ms;--- " << tms/1000 << "s" << std::endl;
 
   //copy the lens image to host
-  cudaMemcpy(lensim.buffer, d_lensim, sizeof(float)*lensim.ntotal, cudaMemcpyDeviceToHost);
+  // cudaMemcpy(lensim.buffer, d_lensim, sizeof(float)*lensim.ntotal, cudaMemcpyDeviceToHost);
+  cudaMemcpy(&lensim[0], d_lensim, sizeof(float)*lensim.ntotal, cudaMemcpyDeviceToHost);
 
   // Write the lens image to a FITS formatted file. You can view this
   // image file using ds9
