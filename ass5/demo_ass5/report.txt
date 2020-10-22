@@ -1,0 +1,110 @@
+ntotal:3125
+r:2; nd:5; cuda_count:221; cuda_t_cost56.522
+ntotal:3125
+r:2.24979; nd:5; cuda_count:333; cuda_t_cost0.452
+ntotal:531441
+r:4.18761; nd:6; cuda_count:27273; cuda_t_cost5.123
+ntotal:78125
+r:2.55379; nd:7; cuda_count:3081; cuda_t_cost1.133
+ntotal:19487171
+r:5.1605; nd:7; cuda_count:446939; cuda_t_cost29.959
+ntotal:7
+r:3.39907; nd:1; cuda_count:7; cuda_t_cost0.422
+ntotal:15
+r:7.59039; nd:1; cuda_count:15; cuda_t_cost0.41
+ntotal:1331
+r:5.33657; nd:3; cuda_count:619; cuda_t_cost0.417
+ntotal:2197
+r:6.60231; nd:3; cuda_count:1213; cuda_t_cost0.423
+ntotal:49
+r:3.51416; nd:2; cuda_count:37; cuda_t_cost0.398
+ntotal:759375
+r:7.25589; nd:5; cuda_count:104767; cuda_t_cost6.637
+ntotal:170859375
+r:7.52157; nd:7; cuda_count:6467039; cuda_t_cost194.513
+ntotal:62748517
+r:6.86258; nd:7; cuda_count:3499165; cuda_t_cost75.447
+ntotal:50625
+r:7.31789; nd:4; cuda_count:13921; cuda_t_cost0.773
+ntotal:15625
+r:2.46065; nd:6; cuda_count:1341; cuda_t_cost0.553
+ntotal:225
+r:7.90935; nd:2; cuda_count:193; cuda_t_cost0.406
+ntotal:50625
+r:7.36344; nd:4; cuda_count:14881; cuda_t_cost0.762
+ntotal:625
+r:2.6055; nd:4; cuda_count:233; cuda_t_cost0.404
+ntotal:15625
+r:2.11905; nd:6; cuda_count:485; cuda_t_cost0.521
+ntotal:13
+r:6.07326; nd:1; cuda_count:13; cuda_t_cost0.416
+
+
+
+ntotal:3125
+r:2; nd:5; seq_count:221; seq_t_cost:1.207; cuda_count:221; cuda_t_cost54.117
+ntotal:3125
+r:2.24979; nd:5; seq_count:333; seq_t_cost:0.763; cuda_count:333; cuda_t_cost0.441
+ntotal:531441
+r:4.18761; nd:6; seq_count:27273; seq_t_cost:151.348; cuda_count:27273; cuda_t_cost5.115
+ntotal:78125
+r:2.55379; nd:7; seq_count:3081; seq_t_cost:25.614; cuda_count:3081; cuda_t_cost1.131
+ntotal:19487171
+r:5.1605; nd:7; seq_count:446939; seq_t_cost:5412.98; cuda_count:446939; cuda_t_cost28.761
+ntotal:7
+r:3.39907; nd:1; seq_count:7; seq_t_cost:0.021; cuda_count:7; cuda_t_cost0.394
+ntotal:15
+r:7.59039; nd:1; seq_count:15; seq_t_cost:0.008; cuda_count:15; cuda_t_cost0.374
+ntotal:1331
+r:5.33657; nd:3; seq_count:619; seq_t_cost:0.181; cuda_count:619; cuda_t_cost0.383
+ntotal:2197
+r:6.60231; nd:3; seq_count:1213; seq_t_cost:0.295; cuda_count:1213; cuda_t_cost0.383
+ntotal:49
+r:3.51416; nd:2; seq_count:37; seq_t_cost:0.012; cuda_count:37; cuda_t_cost0.37
+ntotal:759375
+r:7.25589; nd:5; seq_count:104767; seq_t_cost:150.863; cuda_count:104767; cuda_t_cost5.596
+ntotal:170859375
+r:7.52157; nd:7; seq_count:6467039; seq_t_cost:46945.4; cuda_count:6467039; cuda_t_cost198.467
+ntotal:62748517
+r:6.86258; nd:7; seq_count:3499165; seq_t_cost:17124.3; cuda_count:3499165; cuda_t_cost74.891
+ntotal:50625
+r:7.31789; nd:4; seq_count:13921; seq_t_cost:8.379; cuda_count:13921; cuda_t_cost0.659
+ntotal:15625
+r:2.46065; nd:6; seq_count:1341; seq_t_cost:3.726; cuda_count:1341; cuda_t_cost0.443
+ntotal:225
+r:7.90935; nd:2; seq_count:193; seq_t_cost:0.026; cuda_count:193; cuda_t_cost0.386
+ntotal:50625
+r:7.36344; nd:4; seq_count:14881; seq_t_cost:8.37; cuda_count:14881; cuda_t_cost0.638
+ntotal:625
+r:2.6055; nd:4; seq_count:233; seq_t_cost:0.125; cuda_count:233; cuda_t_cost0.387
+ntotal:15625
+r:2.11905; nd:6; seq_count:485; seq_t_cost:3.68; cuda_count:485; cuda_t_cost0.434
+ntotal:13
+r:6.07326; nd:1; seq_count:13; seq_t_cost:0.007; cuda_count:13; cuda_t_cost0.405
+
+
+
+
+r:2.000000 nd:3 cuda_count:33cuda_t_cost:55.118000
+r:2.249786 nd:3 cuda_count:57cuda_t_cost:0.438000
+r:4.187613 nd:9 cuda_count:1312617cuda_t_cost:135688.068000
+r:2.553786 nd:9 cuda_count:14581cuda_t_cost:682.225000
+r:5.160502 nd:5 cuda_count:18875cuda_t_cost:33.296000
+r:3.399071 nd:8 cuda_count:69233cuda_t_cost:1813.452000
+r:7.590389 nd:3 cuda_count:1839cuda_t_cost:0.869000
+r:5.336566 nd:2 cuda_count:89cuda_t_cost:0.384000
+r:6.602307 nd:9 cuda_count:77445485cuda_t_cost:3768247.650000
+r:3.514159 nd:1 cuda_count:7cuda_t_cost:0.477000
+r:7.255885 nd:3 cuda_count:1575cuda_t_cost:0.864000
+r:7.521566 nd:3 cuda_count:1791cuda_t_cost:0.872000
+r:6.862577 nd:9 cuda_count:114911405cuda_t_cost:3765068.870000
+r:7.317887 nd:4 cuda_count:13921cuda_t_cost:9.236000
+r:2.460647 nd:6 cuda_count:1341cuda_t_cost:4.456000
+r:7.909346 nd:8 cuda_count:61594369cuda_t_cost:814698.478000
+r:7.363435 nd:6 cuda_count:829201cuda_t_cost:2719.041000
+r:2.605498 nd:6 cuda_count:1341cuda_t_cost:4.319000
+r:2.119050 nd:1 cuda_count:5cuda_t_cost:0.380000
+r:6.073264 nd:6 cuda_count:252673cuda_t_cost:1158.926000
+
+r:25.500000
+r:25.500000

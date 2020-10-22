@@ -66,7 +66,7 @@ int main(int argc, char* argv[]){
   for (i=0; i<N/numproc; i++)
   {
     int bktno = (int)((recv_proc_data[i] - xmin)/step); //recv_proc_data[i] 所在桶的编号
-    int index = bktno * pre_proc_recv_amount + nitems[bktno];//todo
+    int index = bktno * pre_proc_recv_amount + nitems[bktno];
 //      cout << i <<",  num: " << recv_proc_data[i]<<" , buckets num:"<<bktno<<" , index:" <<index <<endl;
       bucket[index] = recv_proc_data[i];
     nitems[bktno]++;

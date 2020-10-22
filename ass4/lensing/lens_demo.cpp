@@ -42,8 +42,8 @@ int main(int argc, char* argv[])
     float* xlens;
     float* ylens;
     float* eps;
-//    const int nlenses = set_example_n(len_num, &xlens, &ylens, &eps);
-    const int nlenses = set_example_2( &xlens, &ylens, &eps);
+    const int nlenses = set_example_n(len_num, &xlens, &ylens, &eps);
+//    const int nlenses = set_example_1( &xlens, &ylens, &eps);
     std::cout << "# Simulating " << nlenses << " lens system" << std::endl;
 
     // Source star parameters. You can adjust these if you like - it is

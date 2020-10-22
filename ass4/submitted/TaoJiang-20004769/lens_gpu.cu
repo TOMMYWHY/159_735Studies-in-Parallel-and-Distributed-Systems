@@ -26,11 +26,11 @@
  // kernel
  __global__ void cuda_shoot(float* lensim, int xsize, int ysize, float lens_scale, float* xlens, float* ylens, float* eps, int nlenses)
  {
-   const float xsrc = 0.0;      
+   const float xsrc = 0.0;      // x and y centre on the map
    const float ysrc = 0.0;
-   const float rsrc = 0.1;     
+   const float rsrc = 0.1;      // radius
    const float rsrc2 = rsrc * rsrc;
-   const float ldc  = 0.5;    
+   const float ldc  = 0.5;      // limb darkening coefficient
  
    int index = threadIdx.x + blockIdx.x * blockDim.x;
    if (index >= xsize*ysize)
@@ -135,7 +135,7 @@
     if (file.is_open()){
         file <<"nlenses:"<< to_string(nlenses)<<
         "; seq:"<<to_string(seq_cost);
-        file << "; cuda use " <<to_string(tms) << "\n";
+        file << "; cuda use " <<to_string(tms) << "; thread:"<< threadsPerBlock * blocksPerGrid<< "\n";
         file.close();
     }
  
